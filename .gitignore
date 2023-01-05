@@ -2,5 +2,4 @@
 .idea
 build/
 .DS_Store
-local.propertiess
-/leprechaun/local.properties
+local.properties
