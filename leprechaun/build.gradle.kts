@@ -2,13 +2,16 @@ plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("com.android.library")
+    id("maven-publish")
 }
 
 group = "me.rsetkus"
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    android()
+    android {
+        publishAllLibraryVariants()
+    }
 
     listOf(
         iosX64(),
