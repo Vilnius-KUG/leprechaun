@@ -1,6 +1,9 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode.BITCODE
+
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
+    kotlin("native.cocoapods")
     id("com.android.library")
     id("maven-publish")
 }
@@ -20,6 +23,27 @@ kotlin {
     ).forEach {
         it.binaries.framework {
             baseName = "leprechaun"
+        }
+    }
+
+    cocoapods {
+        // Required properties
+        version = "1.0"
+        summary = "Leprechaun API for Kotlin/Native library"
+        homepage = "https://github.com/Vilnius-KUG/leprechaun"
+
+
+        // Optional properties
+        name = "LeprechaunCocoaPod"
+
+        framework {
+            // Required properties
+            baseName = "leprechaun"
+
+            // Optional properties
+            // Specify the framework linking type. It's dynamic by default.
+            isStatic = false
+            embedBitcode(BITCODE)
         }
     }
 
