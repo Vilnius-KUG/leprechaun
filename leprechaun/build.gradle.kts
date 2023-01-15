@@ -8,8 +8,11 @@ plugins {
     id("maven-publish")
 }
 
+val myLibraryVersion = "1.0.0"
+val myFrameworkName = "leprechaun"
+
 group = "me.rsetkus"
-version = "1.0-SNAPSHOT"
+version = myLibraryVersion
 
 kotlin {
     android {
@@ -22,7 +25,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach {
         it.binaries.framework {
-            baseName = "leprechaun"
+            baseName = myFrameworkName
         }
     }
 
@@ -32,13 +35,19 @@ kotlin {
         summary = "Leprechaun API for Kotlin/Native library"
         homepage = "https://github.com/Vilnius-KUG/leprechaun"
 
+        specRepos {
+            url("https://github.com/Vilnius-KUG/leprechaun-ios-cocoapod.git")
+        }
+
 
         // Optional properties
         name = "LeprechaunCocoaPod"
 
+        ios.deploymentTarget = "13.0"
+
         framework {
             // Required properties
-            baseName = "leprechaun"
+            baseName = myFrameworkName
 
             // Optional properties
             // Specify the framework linking type. It's dynamic by default.
