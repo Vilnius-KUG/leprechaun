@@ -1,4 +1,7 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode.BITCODE
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import com.codingfeline.buildkonfig.gradle.BuildKonfigExtension
+import org.jetbrains.kotlin.konan.properties.Properties
 
 plugins {
     kotlin("multiplatform")
@@ -6,6 +9,7 @@ plugins {
     kotlin("native.cocoapods")
     id("com.android.library")
     id("maven-publish")
+    id("com.codingfeline.buildkonfig")
 }
 
 val myLibraryVersion = "1.0.0"
@@ -92,5 +96,20 @@ android {
     defaultConfig {
         minSdk = 21
         targetSdk = 33
+    }
+}
+
+@Suppress("TooGenericExceptionCaught")
+configure<BuildKonfigExtension> {
+    packageName = "lt.setkus.leprechaun.config"
+
+    val props = Properties()
+
+    try {
+        props.load(file("key.properties").inputStream())
+    } catch (e: Exception) {}
+
+    defaultConfigs {
+        buildConfigField(STRING, "API_KEY", props["API_KEY"]?.toString() ?: "")
     }
 }
