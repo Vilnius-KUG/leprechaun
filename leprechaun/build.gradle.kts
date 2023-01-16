@@ -12,7 +12,7 @@ plugins {
     id("com.codingfeline.buildkonfig")
 }
 
-val myLibraryVersion = "1.0.0"
+val myLibraryVersion = "1.0.2"
 val myFrameworkName = "leprechaun"
 
 group = "me.rsetkus"
@@ -35,7 +35,7 @@ kotlin {
 
     cocoapods {
         // Required properties
-        version = "1.0"
+        version = "1.2"
         summary = "Leprechaun API for Kotlin/Native library"
         homepage = "https://github.com/Vilnius-KUG/leprechaun"
 
@@ -67,6 +67,10 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-logging:$ktorVersion")
+                implementation("ch.qos.logback:logback-classic:1.2.3")
+                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
             }
         }
@@ -99,6 +103,9 @@ android {
     }
 }
 
+/**
+ * Project won't build without 'key.properties' file in leprechaun module
+ */
 @Suppress("TooGenericExceptionCaught")
 configure<BuildKonfigExtension> {
     packageName = "lt.setkus.leprechaun.config"
