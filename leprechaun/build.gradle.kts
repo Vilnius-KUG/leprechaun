@@ -108,7 +108,7 @@ android {
  */
 @Suppress("TooGenericExceptionCaught")
 configure<BuildKonfigExtension> {
-    packageName = "lt.setkus.leprechaun.config"
+    packageName = "me.setkus.leprechaun.config"
 
     val props = Properties()
 
