@@ -11,7 +11,7 @@ class KotlinNativeFlowWrapper<T>(private val flow: Flow<T>): Flow<T> by flow {
     fun subscribe(
         scope: CoroutineScope,
         onEach: (item: T) -> Unit,
-        onComplete: () -> Unit,
+        onComplete: () -> Unit = {},
         onThrow: (error: Throwable) -> Unit
     ) = flow
         .onEach { onEach(it) }

@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import me.rsetkus.leprechaun.data.ExchangeRate
+import me.rsetkus.leprechaun.data.toDomain
+import me.rsetkus.leprechaun.domain.ExchangeRateDomain
 import me.rsetkus.leprechaun.util.KotlinNativeFlowWrapper
 import me.setkus.leprechaun.config.BuildKonfig.API_KEY
 import kotlin.time.Duration
@@ -37,8 +39,10 @@ class CryptoRepository {
         }
     }
 
-    fun getExchangeRate(base: String) = KotlinNativeFlowWrapper<ExchangeRate>(tickerFlow(2.seconds) {
-        client.get("$baseUrl/exchangerate/$base/USD").body()
+    fun getExchangeRate(base: String) = KotlinNativeFlowWrapper(tickerFlow(2.seconds) {
+        client.get("$baseUrl/exchangerate/$base/USD")
+            .body<ExchangeRate>()
+            .toDomain()
     })
 }
 
