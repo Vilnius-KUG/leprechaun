@@ -12,7 +12,7 @@ plugins {
     id("com.codingfeline.buildkonfig")
 }
 
-val myLibraryVersion = "1.0.3"
+val myLibraryVersion = "1.0.8"
 val myFrameworkName = "leprechaun"
 
 group = "me.rsetkus"

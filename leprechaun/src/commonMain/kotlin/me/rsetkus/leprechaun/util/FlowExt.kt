@@ -10,17 +10,6 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlin.coroutines.CoroutineContext
 
-fun <T> Flow<T>.nativeSubscribe(
-    scope: CoroutineScope,
-    onEach: (item: T) -> Unit,
-    onComplete: () -> Unit,
-    onThrow: (error: Throwable) -> Unit
-) = this
-    .onEach { onEach(it) }
-    .catch { onThrow(it) }
-    .onCompletion { onComplete() }
-    .launchIn(scope)
-
 val iosScope: CoroutineScope = object : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = SupervisorJob() + Dispatchers.Main

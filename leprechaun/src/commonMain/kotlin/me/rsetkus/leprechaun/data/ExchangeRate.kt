@@ -12,4 +12,4 @@ data class ExchangeRate(
     @SerialName("rate") val rate: Double
 )
 
-fun ExchangeRate.toDomain()  = ExchangeRateDomain(round(this.rate))
+fun ExchangeRate.toDomain()  = ExchangeRateDomain(round(this.rate * 100.0) / 100.0)
