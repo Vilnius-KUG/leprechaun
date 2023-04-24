@@ -52,8 +52,109 @@ This demo is intended to use local private CocoaPod repository.
 2. Generate `pod` and iOS framework `./gradlew podPublishXCFramework`.
 3. Copy generated framework and podspec file to the pod repository
 (update podspec file with necessary changes because Kotlin CocoaPod plugin doesn't include
-some configuration based on `build.gradle` configuration script).
-4. 
+some configuration based on `build.gradle` configuration script). Push the changes.
+4. Create a tag giving version name and push it.
+5. Under folder where pod located `pod repo add [pod name] [Your git URL to pod]`. In case of update, then
+execute `pod repo update [pod name]`.
+6. Under folder where pod located push changes `pod repo push [pod name] [pod file name].podspec`.
+7. Add/Update iOS application's pod dependencies
+```pod
+platform :ios, '12.0'
 
+source 'https://github.com/CocoaPods/Specs.git'
+source '[Your pod Git URL Goes Here]'
+
+target '[application name]' do
+  pod '[pod name]', '~> [pod version]'
+end 
+```
+Then execute `pod update`
+# How to use
+KMM library exposes public api over class `CryptoRepository`. It has a single function.
+
+```kotlin
+fun getExchangeRate(base: String) : Flow<ExchangeRateDomain>
+```
+Input **base** is crypto asset id in `String` and output is a flow of `ExchangeRateDomain`. 
+List of available assets can be found [here](https://docs.coinapi.io/market-data/rest-api/metadata#list-all-assets-get).
+
+`ExchangeRateDomain` is a domain object which holds rate value.
+### Android
+Since `Flow` is natural in Android, so consume the result of function's at your convenient way.
+### iOS
+There can be various implementations of `Flow` usage in iOS. Bellow there is a one of samples.
+
+**View**
+```swift
+struct ContentView: View {
+    @StateObject var viewModel = ExhangeRateViewModel(repository: CryptoRepository())
+    var body: some View {
+        VStack {
+            let rate = viewModel.exchangeRate
+            Text(String(format: "Exchange rate: %f", rate.rate))
+        }
+        .padding()
+    }
+}
+```
+**ViewModel**
+```swift
+class ExhangeRateViewModel : ObservableObject {
+    @Published var exchangeRate = ExchangeRateDomain(rate: 0.0)
+    
+    private var subscription: AnyCancellable?
+    
+    init(repository: CryptoRepository) {
+        subscription = ExchangeRatePublisher(repository: repository)
+            .assign(to: \.exchangeRate, on: self)
+    }
+}
+```
+**Logic**
+```swift
+class ExchangeRatePublisher : Publisher {
+    public typealias Output = ExchangeRateDomain
+    public typealias Failure = Never
+    
+    private let repository: CryptoRepository
+    public init(repository: CryptoRepository) {
+        self.repository = repository
+    }
+    
+    public func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, ExchangeRateDomain == S.Input {
+        let subscription = ExchangeRateSubscription(repository: repository, subscriber: subscriber)
+        subscriber.receive(subscription: subscription)
+    }
+    
+    final class ExchangeRateSubscription<S: Subscriber>: Subscription where S.Input == ExchangeRateDomain, S.Failure == Failure {
+        private var subscriber: S?
+        private var job: Kotlinx_coroutines_coreJob? = nil
+        
+        private let reposittory: CryptoRepository
+        
+        init(repository: CryptoRepository, subscriber: S) {
+            self.subscriber = subscriber
+            self.reposittory = repository
+            
+            job = repository.getExchangeRate(base: "BTC").subscribe(
+                scope: FlowExtKt.iosScope,
+                onEach: { rate in
+                    subscriber.receive(rate!)
+                },
+                onComplete: { subscriber.receive(completion: .finished) },
+                onThrow: { error in debugPrint(error)}
+            )
+        }
+        
+        func cancel() {
+            subscriber = nil
+            job?.cancel(cause: nil)
+        }
+        
+        func request(_ demand: Subscribers.Demand) {}
+    }
+}
+```
 # Resources
 - [Sharing KMM library with iOS](https://www.notion.so/desquared/Share-KMM-module-with-iOS-via-Cocoa-pods-eaa7c717b83a4805af3dfc72d0e58ac1#2a2417458f8f4e929382775b0a0e8098)
+- [Guide: Creating a CocoaPod using Kotlin Multiplatform Mobile library](https://medium.com/elements/guide-creating-a-cocoapod-using-kotlin-multiplatform-mobile-library-c599fff02b40)
