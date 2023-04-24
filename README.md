@@ -43,7 +43,7 @@ repositories {
 Finally, you should be able to include KMM library into your Android dependencies.
 
 ### iOS
-You would need to setup cocoapods first, if you don't have installed, then setup using
+You would need to set up cocoapods first, if you don't have installed, then setup using
 command `$ sudo gem install cocoapods`.
 
 This demo is intended to use local private CocoaPod repository.
@@ -52,13 +52,32 @@ This demo is intended to use local private CocoaPod repository.
 2. Generate `pod` and iOS framework `./gradlew podPublishXCFramework`.
 3. Copy generated framework and podspec file to the pod repository
 (update podspec file with necessary changes because Kotlin CocoaPod plugin doesn't include
-some configuration based on `build.gradle` configuration script). Push the changes.
+some configuration based on `build.gradle` configuration script). Push the changes. At the end, it should
+look similar to this:
+```podspec
+Pod::Spec.new do |spec|
+   spec.name                     = 'LeprechaunCocoaPod'
+   spec.version                  = '1.8'
+   spec.homepage                 = 'https://github.com/Vilnius-KUG/leprechaun'
+   spec.source                   = { :git=> 'git@github.com:Vilnius-KUG/leprechaun-ios-cocoapod.git',
+   :tag => "#{spec.version}"}
+   spec.authors                  = ''
+   spec.license                  = { :type => "MIT", :file => "LICENSE" }
+   spec.summary                  = 'Leprechaun API for Kotlin/Native library'
+   spec.static_framework         = true
+   spec.vendored_frameworks      = 'leprechaun.xcframework'
+   spec.libraries                = 'c++'
+   spec.ios.deployment_target    = '13.0'
+
+
+end
+```
 4. Create a tag giving version name and push it.
-5. Under folder where pod located `pod repo add [pod name] [Your git URL to pod]`. In case of update, then
-execute `pod repo update [pod name]`.
-6. Under folder where pod located push changes `pod repo push [pod name] [pod file name].podspec`.
+5. Under folder where pod located `pod repo add Leprechaun [Your Leprechaun git URL to pod]`. In case of update, then
+execute `pod repo update Leprechaun`.
+6. Under folder where pod located push changes `pod repo push Leprechaun LeprechaunCocoaPod.podspec`.
 7. Add/Update iOS application's pod dependencies
-```pod
+```podspec
 platform :ios, '12.0'
 
 source 'https://github.com/CocoaPods/Specs.git'
